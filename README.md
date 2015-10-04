@@ -21,3 +21,13 @@ Clean up your project's issue tracker.
 - Go to Heroku Scheduler and enter './run.sh' as the script to be
   running daily.
 `heroku addons:open scheduler`
+
+## Copyright and License
+
+Copyright (c) 2015, [Jon Moss](https://twitter.com/applerebel).
+
+This project is licensed under the [MIT License](LICENSE.md).
+
+# Questions / Concerns?
+
+If you have any questions, just open up an issue on this repo. :)
