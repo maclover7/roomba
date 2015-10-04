@@ -28,6 +28,7 @@ issue_numbers = issues.each.map(&:number)
 # Get a list of all comments for each open issue, then check if the most recent (last) comment
 # was made before a certain time. If so, comment and close the issue.
 issue_numbers.each do |issue_number|
+  issue = OCTOKIT_CLIENT.issue(ENV['ROOMBA_GITHUB_REPO'], issue_number)
   comments = OCTOKIT_CLIENT.issue_comments(ENV['ROOMBA_GITHUB_REPO'], issue_number)
 
   if comments && !comments.empty?
@@ -36,9 +37,25 @@ issue_numbers.each do |issue_number|
     last_updated_at_time = Time.parse(last_updated_at_string)
   else
     # Get the actual issue's updated_at time. Represents last time issue was looked at.
-    issue = OCTOKIT_CLIENT.issue(ENV['ROOMBA_GITHUB_REPO'], issue_number)
     last_updated_at_string = issue[:updated_at].to_s
     last_updated_at_time = Time.parse(last_updated_at_string)
+  end
+
+  # Check if skip label is included
+  labels = issue.labels
+  if labels && !labels.empty?
+    skip = false
+
+    labels.each do |label|
+      if label.to_h.has_value?(ENV['ROOMBA_SKIP_LABEL'])
+        skip = true
+      end
+    end
+
+    if skip == true
+      puts "Skipping #{ENV['ROOMBA_GITHUB_REPO']}##{issue_number}."
+      next
+    end
   end
 
   # Parse ENV['ROOMBA_CLOSE_AT'], and eval to transform from String to Time.
